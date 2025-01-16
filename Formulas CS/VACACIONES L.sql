@@ -4,6 +4,8 @@ declare @A real;
 declare @dias real;
 declare @CalcInvVac real;
 declare @Promedio real;
+declare @Asignacion1 real;
+declare @MesesCalcular real;
 
 
 
