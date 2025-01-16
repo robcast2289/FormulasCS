@@ -17,4 +17,5 @@ set @diario =  (@Plan / @dias);
 
 -- ## FORMULA
 
-(@Plan/{Dias_Calendario_Nomina}) * (@dias - ({Dias_Tipo_Ausencia,AUSENCIA PRUEB} + {Dias_Tipo_Ausencia,SUSP. IGSS}))
+/*(@Plan/{Dias_Calendario_Nomina}) * (@dias - ({Dias_Tipo_Ausencia,AUSENCIA PRUEB} + {Dias_Tipo_Ausencia,SUSP. IGSS}))*/
+(@Plan/{Dias_Calendario_Nomina}) * (@dias)

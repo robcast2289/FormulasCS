@@ -12,6 +12,8 @@ declare @diasauig real;
 set @Plan = {MontoPlanMensual};
 set @diasnomi = {Dias_Lab_Calendario_Exact};
 set @diasvac = {Dias_Tipo_Ausencia,VACACIONES};
+
+/* Dias de suspensiones IGSS */
 set @diasauig = {Dias_Tipo_Ausencia,SUSP. IGSS};
 
 
@@ -22,4 +24,12 @@ set @diasauig = {Dias_Tipo_Ausencia,SUSP. IGSS};
 /*else*/
 /*end*/
 
-( {MontoPlanMensual} /{Dias_Calendario_Nomina}) * (( {Dias_Lab_Calendario_Exact} ) + @diasvac + @diasauig + {Dias_Tipo_Ausencia,AUSENCIA PRUEB})
+/*( {MontoPlanMensual} /{Dias_Calendario_Nomina}) * (( {Dias_Lab_Calendario_Exact} ) + @diasvac + @diasauig + {Dias_Tipo_Ausencia,AUSENCIA PRUEB})*/
+
+
+if (@diasnomi = @diasauig) then
+    0
+/*{MontoPlanMensual}*/
+else
+    ( {MontoPlanMensual} /{Dias_Calendario_Nomina}) * (( {Dias_Lab_Calendario_Exact} ) + @diasvac + @diasauig )
+end
