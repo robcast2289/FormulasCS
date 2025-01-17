@@ -65,7 +65,7 @@ IF @SalarioPrimerDia = 0 BEGIN
     INNER JOIN PAYROLLABSENCETABLE T2 ON T1.PAYROLLABSENCETABLEID = T2.PAYROLLABSENCETABLEID 
     WHERE T1.TRANSDATE BETWEEN @FechaInicioMesAnterior AND @FechaFinMesAnterior
     AND T2.EMPLID = '%12'
-    AND ( T1.PAYROLLABSENCECODEID = @codSuspencion )) - 1
+    AND ( T1.PAYROLLABSENCECODEID = @codSuspencion )) 
 
     SET @VAR2 = 
     CASE
@@ -87,4 +87,3 @@ END
 
 
 SELECT @SalarioPrimerDia + @SalarioSegundaParte
-/*SELECT @SalarioDiario*/
