@@ -27,63 +27,63 @@ SET @diasSuspencion = (SELECT COUNT(*) FROM PAYROLLABSENCETRANS T1
 
 
 
-
-SET @VAR1= (SELECT COUNT(*) 
-FROM PAYROLLABSENCETRANS T1
-INNER JOIN PAYROLLABSENCETABLE T2 ON T1.PAYROLLABSENCETABLEID = T2.PAYROLLABSENCETABLEID 
-WHERE T1.TRANSDATE = @FechaInicio
-AND T2.EMPLID = '%12'
-AND T1.PAYROLLABSENCECODEID = @codSuspencion)
-
-IF @VAR1 = 0
-BEGIN
-    SET @SalarioPrimerDia = @SalarioDiario
-END
-ELSE
-BEGIN
-    SET @VAR2= (SELECT COUNT(*) 
+IF @diasSuspencion > 0 BEGIN
+    SET @VAR1= (SELECT COUNT(*) 
     FROM PAYROLLABSENCETRANS T1
     INNER JOIN PAYROLLABSENCETABLE T2 ON T1.PAYROLLABSENCETABLEID = T2.PAYROLLABSENCETABLEID 
-    WHERE T1.TRANSDATE = @FechaFinMesAnterior
+    WHERE T1.TRANSDATE = @FechaInicio
     AND T2.EMPLID = '%12'
     AND T1.PAYROLLABSENCECODEID = @codSuspencion)
-    IF @VAR2 = 0
+
+    IF @VAR1 = 0
     BEGIN
         SET @SalarioPrimerDia = @SalarioDiario
     END
     ELSE
     BEGIN
-        SET @SalarioPrimerDia = 0
-    END
-END
-
-
-
-IF @SalarioPrimerDia = 0 BEGIN
-    SET @VAR1= (SELECT COUNT(*) 
-    FROM PAYROLLABSENCETRANS T1
-    INNER JOIN PAYROLLABSENCETABLE T2 ON T1.PAYROLLABSENCETABLEID = T2.PAYROLLABSENCETABLEID 
-    WHERE T1.TRANSDATE BETWEEN @FechaInicioMesAnterior AND @FechaFinMesAnterior
-    AND T2.EMPLID = '%12'
-    AND ( T1.PAYROLLABSENCECODEID = @codSuspencion )) 
-
-    SET @VAR2 = 
-    CASE
-        WHEN (14 - @VAR1) > @diasSuspencion THEN @diasSuspencion
-        WHEN (14 - @VAR1) <= @diasSuspencion THEN (14 - @VAR1)
-    END
-            
-    SET @SalarioSegundaParte = (@VAR2 * @SalarioDiario) / 3
-END
-ELSE BEGIN
-    SET @VAR2 = 
-    CASE
-        WHEN (14) > (@diasSuspencion - 1) THEN (@diasSuspencion - 1)
-        WHEN (14) <= (@diasSuspencion - 1) THEN (14)
+        SET @VAR2= (SELECT COUNT(*) 
+        FROM PAYROLLABSENCETRANS T1
+        INNER JOIN PAYROLLABSENCETABLE T2 ON T1.PAYROLLABSENCETABLEID = T2.PAYROLLABSENCETABLEID 
+        WHERE T1.TRANSDATE = @FechaFinMesAnterior
+        AND T2.EMPLID = '%12'
+        AND T1.PAYROLLABSENCECODEID = @codSuspencion)
+        IF @VAR2 = 0
+        BEGIN
+            SET @SalarioPrimerDia = @SalarioDiario
+        END
+        ELSE
+        BEGIN
+            SET @SalarioPrimerDia = 0
+        END
     END
 
-    SET @SalarioSegundaParte = (@VAR2 * @SalarioDiario) / 3
-END
 
+
+    IF @SalarioPrimerDia = 0 BEGIN
+        SET @VAR1= (SELECT COUNT(*) 
+        FROM PAYROLLABSENCETRANS T1
+        INNER JOIN PAYROLLABSENCETABLE T2 ON T1.PAYROLLABSENCETABLEID = T2.PAYROLLABSENCETABLEID 
+        WHERE T1.TRANSDATE BETWEEN @FechaInicioMesAnterior AND @FechaFinMesAnterior
+        AND T2.EMPLID = '%12'
+        AND ( T1.PAYROLLABSENCECODEID = @codSuspencion )) 
+
+        SET @VAR2 = 
+        CASE
+            WHEN (14 - @VAR1) > @diasSuspencion THEN @diasSuspencion
+            WHEN (14 - @VAR1) <= @diasSuspencion THEN (14 - @VAR1)
+        END
+                
+        SET @SalarioSegundaParte = (@VAR2 * @SalarioDiario) / 3
+    END
+    ELSE BEGIN
+        SET @VAR2 = 
+        CASE
+            WHEN (14) > (@diasSuspencion - 1) THEN (@diasSuspencion - 1)
+            WHEN (14) <= (@diasSuspencion - 1) THEN (14)
+        END
+
+        SET @SalarioSegundaParte = (@VAR2 * @SalarioDiario) / 3
+    END
+END
 
 SELECT @SalarioPrimerDia + @SalarioSegundaParte
