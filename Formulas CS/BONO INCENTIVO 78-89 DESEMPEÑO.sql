@@ -31,12 +31,10 @@ set @diaslab = {Dias_Calendario_Nomina}
 set @IngresosMinimo = {Total_Ingresos_Trans,G_AJUSTEALMINIMO}
 set @IngresosMinimo = @IngresosMinimo + @Plan;
 
-set @Ingresos = @Ingresos + (@MinimoLey - @IngresosMinimo)
+set @Ingresos = @Ingresos + si_tern((@MinimoLey - @IngresosMinimo)>0,(@MinimoLey - @IngresosMinimo),0)
 
 set @IngresosDiario = (@MinimoCofino - @Ingresos) / @diaslab;
 set @montoSusp = {Funcion,SalarioDeSuspencion,@IngresosDiario};
-
- set @test = {Funcion,test_variable,@IngresosDiario};
 
 
 -- ## FORMULA
