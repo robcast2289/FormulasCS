@@ -7,7 +7,14 @@ declare @DiasAusencia real;
 declare @diario real;
 declare @MinimoCofino real;
 declare @Ingresos real;
+declare @IngresosDiario real;
 declare @diaslab real;
+
+declare @MinimoLey real;
+declare @IngresosMinimo real;
+declare @montoSusp real;
+
+declare @test real;
 
 
 -- ## ASIGNACIONES
@@ -18,7 +25,18 @@ set @diario =  (@Plan / @dias);
 set @Ingresos = {Total_Ingresos_Trans,G_MINIMOCOFINO};
 set @Ingresos = @Ingresos + @Plan;
 set @MinimoCofino = 3700.00;
-set @diaslab = {Dias_Calendario_Nomina} + {Dias_Tipo_Ausencia,VACACIONES}
+set @MinimoLey = {Salario_Minimo_Zona_Empl}
+set @diaslab = {Dias_Calendario_Nomina}
+
+set @IngresosMinimo = {Total_Ingresos_Trans,G_AJUSTEALMINIMO}
+set @IngresosMinimo = @IngresosMinimo + @Plan;
+
+set @Ingresos = @Ingresos + (@MinimoLey - @IngresosMinimo)
+
+set @IngresosDiario = (@MinimoCofino - @Ingresos) / @diaslab;
+set @montoSusp = {Funcion,SalarioDeSuspencion,@IngresosDiario};
+
+ set @test = {Funcion,test_variable,@IngresosDiario};
 
 
 -- ## FORMULA
@@ -31,7 +49,7 @@ ELSE
 END*/
 
 IF (@Ingresos < (@MinimoCofino)) THEN
-    ((@MinimoCofino - @Ingresos) / @diaslab) * @dias
+    (((@MinimoCofino - @Ingresos) / @diaslab) * @dias) + @montoSusp
 ELSE
     0
 END

@@ -16,9 +16,9 @@ set @dias = {Dias_Lab_Calendario_Exact};
 set @diasnomi = {Dias_Calendario_Nomina};
 /*set @DiasAusencia = {CantidadTransaccion};*/
 set @Plan = {SalarioMensual};
-set @diario =  (@Plan / @dias);
+set @diario =  (@Plan / @diasnomi);
 
-set @montoSusp = {Funcion,SalarioDeSuspencion};
+set @montoSusp = {Funcion,SalarioDeSuspencion,@diario};
 
 
 -- ## FORMULA

@@ -3,6 +3,7 @@ DECLARE @codSuspencion VARCHAR(10) = 'SUSP. IGSS'
 
 DECLARE @salarioOrdinario REAL = CONVERT(REAL,'%27')
 DECLARE @diasNomina INT
+DECLARE @diasMaxTercera INT = 13
 
 DECLARE @tipoSusp INT
 
@@ -16,15 +17,15 @@ DECLARE @VAR3 INT = 0
 DECLARE @VAR4 INT = 0
 DECLARE @SalarioPrimerDia REAL
 DECLARE @SalarioSegundaParte REAL
-
+DECLARE @SalarioDiario REAL
 SET @diasNomina = DATEDIFF(DAY, @FechaInicio, @FechaFin) + 1
-DECLARE @SalarioDiario REAL = @SalarioOrdinario / @diasNomina
+/*DECLARE @SalarioDiario REAL = @SalarioOrdinario / @diasNomina*/
+SET @SalarioDiario = @PARAM_1
 
 SET @diasSuspencion = (SELECT COUNT(*) FROM PAYROLLABSENCETRANS T1
     INNER JOIN PAYROLLABSENCETABLE T2 ON T1.PAYROLLABSENCETABLEID = T2.PAYROLLABSENCETABLEID 
     WHERE T1.TRANSDATE BETWEEN @FechaInicio AND @FechaFin
-    AND T2.EMPLID = '%12' AND T1.PAYROLLABSENCECODEID = @codSuspencion AND T1.HOURS > 0)
-
+    AND T2.EMPLID = '%12' AND T1.PAYROLLABSENCECODEID = @codSuspencion AND T1.HOURS <> 0)
 
 
 IF @diasSuspencion > 0 BEGIN
@@ -69,8 +70,8 @@ IF @diasSuspencion > 0 BEGIN
 
         SET @VAR2 = 
         CASE
-            WHEN (14 - @VAR1) > @diasSuspencion THEN @diasSuspencion
-            WHEN (14 - @VAR1) <= @diasSuspencion THEN (14 - @VAR1)
+            WHEN (@diasMaxTercera - @VAR1) > @diasSuspencion THEN @diasSuspencion
+            WHEN (@diasMaxTercera - @VAR1) <= @diasSuspencion THEN (@diasMaxTercera - @VAR1)
         END
                 
         SET @SalarioSegundaParte = (@VAR2 * @SalarioDiario) / 3
@@ -78,12 +79,14 @@ IF @diasSuspencion > 0 BEGIN
     ELSE BEGIN
         SET @VAR2 = 
         CASE
-            WHEN (14) > (@diasSuspencion - 1) THEN (@diasSuspencion - 1)
-            WHEN (14) <= (@diasSuspencion - 1) THEN (14)
+            WHEN (@diasMaxTercera) > (@diasSuspencion - 1) THEN (@diasSuspencion - 1)
+            WHEN (@diasMaxTercera) <= (@diasSuspencion - 1) THEN (@diasMaxTercera)
         END
 
         SET @SalarioSegundaParte = (@VAR2 * @SalarioDiario) / 3
     END
 END
 
+
 SELECT @SalarioPrimerDia + @SalarioSegundaParte
+/*SELECT @SalarioDiario*/
