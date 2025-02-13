@@ -42,17 +42,25 @@ BEGIN
         @FechaBono = t1.LASTBONO14
     FROM PAYROLLEMPL t1
     WHERE t1.EMPLID = '%12'
+    AND t1.DATAAREAID = '%1'
 
     IF @TIPO_PRESTACION = 'AGUINALDO'
+    BEGIN
         IF @FechaAguinaldo = NULL OR @FechaAguinaldo = CONVERT(DATE,'01/01/1900',103)
             SET @FechaInicial = CONVERT(DATE,'%19',103)
         ELSE
             SET @FechaInicial = @FechaAguinaldo
+    END
     IF @TIPO_PRESTACION = 'BONO14'
+    BEGIN
         IF @FechaBono = NULL OR @FechaBono = CONVERT(DATE,'01/01/1900',103)
             SET @FechaInicial = CONVERT(DATE,'%19',103)
         ELSE
             SET @FechaInicial = @FechaBono
+    END
+
+    IF @FechaInicial < CONVERT(DATE,'%19',103)
+        SET @FechaInicial = CONVERT(DATE,'%19',103)
 END
 ELSE
 BEGIN
@@ -85,9 +93,11 @@ DECLARE PayRollTransEmplElement_Cursor CURSOR FOR
         t2.FROMDATE, t2.TODATE, t2.TRANSID
     from PAYROLLTRANSEMPLELEMENT t1
     join PAYROLLTRANS t2 on t1.TRANSID = t2.TRANSID
+        and t1.DATAAREAID = t2.DATAAREAID
     where t1.ELEMENTID IN (SELECT ElementId
         FROM PayRollElementPerGroup
-        WHERE ElementGroupId = @ElementGroupId)
+        WHERE ElementGroupId = @ElementGroupId
+        AND DATAAREAID = '%1')
     AND t1.ELEMENTTYPE = 0
     and t1.EMPLID = '%12'
     AND ((t2.FROMDATE <= @FechaInicial
@@ -97,6 +107,7 @@ DECLARE PayRollTransEmplElement_Cursor CURSOR FOR
         OR (t2.FROMDATE <= @FechaFinal
         AND t2.TODATE >= @FechaFinal))
     and t2.STATUS >= 6
+    AND t1.DATAAREAID = '%1'
     group by t2.FROMDATE, t2.TODATE, t2.TRANSID
 
 OPEN PayRollTransEmplElement_Cursor
@@ -106,23 +117,26 @@ FETCH NEXT FROM PayRollTransEmplElement_Cursor INTO @SUMAINGRESOS, @DIAS, @Fecha
 WHILE @@FETCH_STATUS = 0
 BEGIN
 
-    SET @DIASMES = DATEDIFF(DAY,@FechaInicial,@FechaFinal) + 1
+    SET @DIASMES = DATEDIFF(DAY,@FechaInicialMes,@FechaFinalMes) + 1
 
     SET @DIAS = (SELECT SUM(t1.QUANTITY)
     FROM PAYROLLTRANSEMPLELEMENT t1
     WHERE t1.TRANSID = @TransId
     AND t1.EMPLID = '%12'
-    AND t1.ELEMENTID IN ('SUSPENSIÓN','SUELDO ORDINARIO','SUELDO ORDINARIO JUB','VACACIONES')
-    AND t1.ELEMENTTYPE = 0)
+    AND t1.ELEMENTID IN ('SUELDO ORDINARIO','SUELDO ORDINARIO JUB','VACACIONES')
+    AND t1.ELEMENTTYPE = 0
+    AND t1.DATAAREAID = '%1')
 
-    IF @DIASMES <> @DIAS
+    IF (@DIASMES <> @DIAS) AND (@PROMEDIO_COFIÑO = 1)
     BEGIN
         SET @VAR1= (SELECT COUNT(*) 
         FROM PAYROLLABSENCETRANS T1
         INNER JOIN PAYROLLABSENCETABLE T2 ON T1.PAYROLLABSENCETABLEID = T2.PAYROLLABSENCETABLEID 
+            AND T1.DATAAREAID = T2.DATAAREAID
         WHERE T1.TRANSDATE BETWEEN @FechaInicialMes AND @FechaFinalMes
         AND T2.EMPLID = '%12'
-        AND ( T1.PAYROLLABSENCECODEID in ('SUSP. IGSS','SUSP. MATERN') )) 
+        AND ( T1.PAYROLLABSENCECODEID in ('SUSP. IGSS','SUSP. MATERN') )
+        AND T1.DATAAREAID = '%1') 
 
         IF (@VAR1 + @DIAS) <> (@DIASMES)
         BEGIN

@@ -18,10 +18,24 @@ declare @SalarioActual real;
 
 declare @PctDias real;
 
+declare @Promedio real;
+declare @param_1 nvarchar(60);
+declare @param_2 nvarchar(60);
+declare @param_3 int;
+declare @param_4 int;
+declare @param_5 int;
+
 
 -- ## ASIGNACIONES
 
-set @PIndemniza = {Monto_Acumulado_Mes,MC,6,G_INDEMNIZACION_L,D,Pmeses};
+set @param_1 = 'OTRO';
+set @param_2 = 'G_INDEMNIZACION_L';
+set @param_3 = 6;
+set @param_4 = 1;
+set @param_5 = 0;
+set @PIndemniza = {Funcion,Monto_Acumulado_Cofal,[@param_1,@param_2,@param_3,@param_4,@param_5]};  
+
+/*set @PIndemniza = {Monto_Acumulado_Mes,MC,6,G_INDEMNIZACION_L,D,Pmeses};*/
 set @SalarioActual = {SalarioMensual};
 
 -- Aguinaldo
