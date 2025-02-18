@@ -15,7 +15,7 @@ declare @param_5 int;
 
 set @param_1 = 'BONO14';
 set @param_2 = 'G_BONO14_L';
-set @param_3 = 11;
+set @param_3 = 12;
 set @param_4 = 1;
 set @param_5 = 0;
 set @bono14 = {Funcion,Monto_Acumulado_Cofal,[@param_1,@param_2,@param_3,@param_4,@param_5]};

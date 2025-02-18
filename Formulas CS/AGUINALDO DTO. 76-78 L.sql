@@ -17,7 +17,7 @@ declare @param_5 int;
 
 set @param_1 = 'AGUINALDO';
 set @param_2 = 'G_AGUINALDO_L_COM';
-set @param_3 = 11;
+set @param_3 = 12;
 set @param_4 = 1;
 set @param_5 = 0;
 set @Aguinaldo = {Funcion,Monto_Acumulado_Cofal,[@param_1,@param_2,@param_3,@param_4,@param_5]};

@@ -39,15 +39,23 @@ set @PIndemniza = {Funcion,Monto_Acumulado_Cofal,[@param_1,@param_2,@param_3,@pa
 set @SalarioActual = {SalarioMensual};
 
 -- Aguinaldo
+set @param_1 = 'AGUINALDO';
+set @param_2 = 'G_AGUINALDO_L_COM';
+set @param_3 = 12;
 set @DiasAguinaldo = {DiasLiq_AguinaldoBono14,A};
-set @PromAguinaldo = {Promedio_AguinaldoBono14,A,PMESES,G_AGUINALDO_L_COM,MC,11};
+set @PromAguinaldo = {Funcion,Monto_Acumulado_Cofal,[@param_1,@param_2,@param_3,@param_4,@param_5]};
+/*set @PromAguinaldo = {Promedio_AguinaldoBono14,A,PMESES,G_AGUINALDO_L_COM,MC,11};*/
 set @PromFinAguinaldo = @SalarioActual + @PromAguinaldo;
 set @DoceavaAgui = @PromFinAguinaldo / 12;
 
 
 -- Bono 14
+set @param_1 = 'BONO14';
+set @param_2 = 'G_BONO14_L';
+set @param_3 = 12;
 set @DiasBono = {DiasLiq_AguinaldoBono14,A};
-set @PromBono = {Promedio_AguinaldoBono14,B,PMESES,G_BONO14_L,MC,11};
+set @PromBono = {Funcion,Monto_Acumulado_Cofal,[@param_1,@param_2,@param_3,@param_4,@param_5]};
+/*set @PromBono = {Promedio_AguinaldoBono14,B,PMESES,G_BONO14_L,MC,11};*/
 set @PromFinBono = @PromBono;
 set @DoceavaBono = @PromFinBono / 12;
 
