@@ -87,32 +87,26 @@ BEGIN
 END
 
 DECLARE PayRollTransEmplElement_Cursor CURSOR FOR
-    select 
-        SUM(ROUND(t1.amount,2)) ingresos, 
-        SUM(t1.quantity) cantidad,
+    SELECT 
         t2.FROMDATE, t2.TODATE, t2.TRANSID
-    from PAYROLLTRANSEMPLELEMENT t1
-    join PAYROLLTRANS t2 on t1.TRANSID = t2.TRANSID
-        and t1.DATAAREAID = t2.DATAAREAID
-    where t1.ELEMENTID IN (SELECT ElementId
-        FROM PayRollElementPerGroup
-        WHERE ElementGroupId = @ElementGroupId
-        AND DATAAREAID = '%1')
-    AND t1.ELEMENTTYPE = 0
-    and t1.EMPLID = '%12'
+    FROM PAYROLLTRANSEMPLELEMENT t1
+    JOIN PAYROLLTRANS t2 ON t1.TRANSID = t2.TRANSID
+        AND t1.DATAAREAID = t2.DATAAREAID
+    WHERE t1.ELEMENTTYPE = 0
+    AND t1.EMPLID = '%12'
     AND ((t2.FROMDATE <= @FechaInicial
         AND t2.TODATE >= @FechaInicial)
         OR (t2.FROMDATE >= @FechaInicial
         AND t2.TODATE <= @FechaFinal)
         OR (t2.FROMDATE <= @FechaFinal
         AND t2.TODATE >= @FechaFinal))
-    and t2.STATUS >= 6
+    AND t2.STATUS >= 6
     AND t1.DATAAREAID = '%1'
-    group by t2.FROMDATE, t2.TODATE, t2.TRANSID
+    GROUP BY t2.FROMDATE, t2.TODATE, t2.TRANSID
 
 OPEN PayRollTransEmplElement_Cursor
 
-FETCH NEXT FROM PayRollTransEmplElement_Cursor INTO @SUMAINGRESOS, @DIAS, @FechaInicialMes, @FechaFinalMes, @TransId
+FETCH NEXT FROM PayRollTransEmplElement_Cursor INTO @FechaInicialMes, @FechaFinalMes, @TransId
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
@@ -125,7 +119,20 @@ BEGIN
     AND t1.EMPLID = '%12'
     AND t1.ELEMENTID IN ('SUELDO ORDINARIO','SUELDO ORDINARIO JUB','VACACIONES')
     AND t1.ELEMENTTYPE = 0
-    AND t1.DATAAREAID = '%1')
+    AND t1.DATAAREAID = '%1');
+
+    SET @SUMAINGRESOS = (SELECT ISNULL(SUM(t1.AMOUNT),0)
+    FROM PAYROLLTRANSEMPLELEMENT t1
+    WHERE t1.TRANSID = @TransId
+    AND t1.EMPLID = '%12'
+    AND t1.ELEMENTID IN (
+        SELECT ElementId
+        FROM PayRollElementPerGroup
+        WHERE ElementGroupId = @ElementGroupId
+        AND DATAAREAID = '%1'
+    )
+    AND t1.ELEMENTTYPE = 0
+    AND t1.DATAAREAID = '%1');
 
     IF (@DIASMES <> @DIAS) AND (@PROMEDIO_COFIÑO = 1)
     BEGIN
@@ -152,7 +159,7 @@ BEGIN
         SET @ACUMULADODIAS = @ACUMULADODIAS + @DIAS
     END
 
-    FETCH NEXT FROM PayRollTransEmplElement_Cursor INTO @SUMAINGRESOS, @DIAS, @FechaInicialMes, @FechaFinalMes, @TransId
+    FETCH NEXT FROM PayRollTransEmplElement_Cursor INTO @FechaInicialMes, @FechaFinalMes, @TransId
 END
 
 CLOSE PayRollTransEmplElement_Cursor
@@ -161,7 +168,13 @@ DEALLOCATE PayRollTransEmplElement_Cursor
 
 IF @TIPO_RETORNO = 0
 BEGIN
-    SELECT ROUND(@ACUMULADO / @CONTAMES,2)
+    IF @CONTAMES = 0
+    BEGIN
+        SELECT 0
+    END
+    ELSE BEGIN
+        SELECT ROUND(@ACUMULADO / @CONTAMES,2) 
+    END
 END
 IF @TIPO_RETORNO = 1
 BEGIN
