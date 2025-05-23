@@ -4,6 +4,7 @@ declare @Dias real;
 declare @Aguinaldo real;
 declare @SalarioActual real;
 declare @Salrio_mas_promedio real;
+declare @MinimoLey real;
 
 declare @Promedio real;
 declare @param_1 nvarchar(60);
@@ -27,6 +28,8 @@ set @Dias = {DiasLiq_AguinaldoBono14,A};
 set @SalarioActual = {SalarioMensual};
 set @Salrio_mas_promedio = @SalarioActual + @Aguinaldo;
 
+set @MinimoLey = {Salario_Minimo_Zona_Empl};
+set @Salrio_mas_promedio = si_tern(@Salrio_mas_promedio < @MinimoLey, @MinimoLey, @Salrio_mas_promedio);
 
 
 -- ## FORMULA

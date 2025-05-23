@@ -2,6 +2,7 @@
 
 declare @Dias real;
 declare @bono14 real;
+declare @MinimoLey real;
       
 declare @Promedio real;
 declare @param_1 nvarchar(60);
@@ -23,6 +24,9 @@ set @bono14 = {Funcion,Monto_Acumulado_Cofal,[@param_1,@param_2,@param_3,@param_
 /*set @bono14 = ({Promedio_AguinaldoBono14,B,PMESES,G_BONO14_L,MC,11});*/
 set @Dias = {DiasLiq_AguinaldoBono14,B};
 set @bono14 = si_tern(@bono14=0,{SalarioMensual},@bono14);
+
+set @MinimoLey = {Salario_Minimo_Zona_Empl};
+set @bono14 = si_tern(@bono14 < @MinimoLey, @MinimoLey, @bono14);
 
 
 -- ## FORMULA
