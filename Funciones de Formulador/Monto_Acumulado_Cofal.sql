@@ -94,13 +94,11 @@ DECLARE PayRollTransEmplElement_Cursor CURSOR FOR
         AND t1.DATAAREAID = t2.DATAAREAID
     WHERE t1.ELEMENTTYPE = 0
     AND t1.EMPLID = '%12'
-    AND ((t2.FROMDATE <= @FechaInicial
-        AND t2.TODATE >= @FechaInicial)
-        OR (t2.FROMDATE >= @FechaInicial
-        AND t2.TODATE <= @FechaFinal)
-        OR (t2.FROMDATE <= @FechaFinal
-        AND t2.TODATE >= @FechaFinal))
+    AND ((
+        t2.FROMDATE >= @FechaInicial AND t2.TODATE <= @FechaFinal
+    ))
     AND t2.STATUS >= 6
+    AND t2.BENEFITTYPE = 4
     AND t1.DATAAREAID = '%1'
     GROUP BY t2.FROMDATE, t2.TODATE, t2.TRANSID
 
